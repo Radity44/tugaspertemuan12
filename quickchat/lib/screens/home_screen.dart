@@ -29,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _handleLogout() async {
     try {
+      NotificationService().dispose();
       await _authService.signOut();
     } catch (e) {
       if (mounted) {
