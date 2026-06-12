@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -16,19 +17,24 @@ class AuthService {
   // Google Sign In
   Future<UserCredential?> signInWithGoogle() async {
     try {
+      print("STEP 1");
       // Trigger the Google authentication flow (version 7.2.0+)
       final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
+      print("STEP 2");
       
       // Obtain the auth details (getter in 7.2.0+, not a Future, no await needed)
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      print("STEP 3");
 
       // Create a new credential using the ID token
       final AuthCredential credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
       );
+      print("STEP 4");
 
       // Sign in to Firebase with the Google credential
       final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      print("STEP 5");
       final User? user = userCredential.user;
 
       if (user != null) {
@@ -37,13 +43,17 @@ class AuthService {
       }
 
       return userCredential;
-    } on GoogleSignInException catch (e) {
+    } on GoogleSignInException catch (e, stackTrace) {
+      print("LOGIN ERROR: $e");
+      print(stackTrace);
       // If the user cancels the sign-in flow
       if (e.code == GoogleSignInExceptionCode.canceled) {
         return null;
       }
       rethrow;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      print("LOGIN ERROR: $e");
+      print(stackTrace);
       rethrow;
     }
   }
